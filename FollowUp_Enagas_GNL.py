@@ -103,9 +103,14 @@ def descargar_y_extraer(fecha):
 
     return registro
 
-def guardar_historico(df):
+def guardar_historico(historico):
 
-    df.to_csv(
+    historico = historico.loc[
+        :,
+        ~historico.columns.str.contains("^Unnamed")
+    ]
+
+    historico.to_csv(
         CSV_FILE,
         index=False,
         encoding="utf-8-sig"
@@ -155,6 +160,13 @@ def main():
             ],
             ignore_index=True
         )
+
+        resultado = resultado.drop_duplicates(
+            subset=["Fecha"],
+            keep="last"
+        )
+
+        resultado = resultado.sort_values("Fecha")
 
         resultado.to_csv(
             CSV_FILE,
