@@ -29,7 +29,7 @@ def obtener_fecha_inicio():
     historico = pd.read_csv(CSV_FILE)
 
     if historico.empty:
-        return datetime(2025, 1, 1).date()
+        return datetime(2026, 7, 12).date()
 
     historico["Fecha"] = pd.to_datetime(
         historico["Fecha"]
