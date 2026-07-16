@@ -48,7 +48,6 @@ def construir_url(fecha):
         f"{fecha.strftime('%d/%m/%Y')}"
     )
 
-
 def descargar_y_extraer(fecha):
 
     fecha_txt = fecha.strftime("%Y-%m-%d")
@@ -58,7 +57,6 @@ def descargar_y_extraer(fecha):
     print(f"Procesando {fecha_txt}")
 
     r = requests.get(url, timeout=60)
-
     r.raise_for_status()
 
     with open("temp.xls", "wb") as f:
@@ -69,51 +67,41 @@ def descargar_y_extraer(fecha):
         header=None
     )
 
-    print(df.iloc[22:34, 2:12])
-
-    datos = df.iloc[22:34, 2:12]
-
     registro = {
         "Fecha": fecha_txt
     }
 
-    for fila in range(datos.shape[0]):
+    terminales = {
+        "TOTAL": 4,
+        "BARCELONA": 5,
+        "CARTAGENA": 6,
+        "HUELVA": 7,
+        "BBG": 8,
+        "SAGUNTO": 9,
+        "REGANOSA": 10,
+        "MUSEL": 11
+    }
 
-        concepto = str(
-            datos.iloc[fila, 0]
-        ).strip()
+    for terminal, col in terminales.items():
 
-        unidad = str(
-            datos.iloc[fila, 1]
-        ).strip()
+        registro[f"{terminal}_Exist_Inicial_GWh"] = df.iloc[23, col]
+        registro[f"{terminal}_Exist_Inicial_m3"] = df.iloc[24, col]
 
-        nombre_fila = (
-            concepto
-            .replace(".", "")
-            .replace(" ", "_")
-            .replace("%", "Pct")
-        )
+        registro[f"{terminal}_Cargas_GNL"] = df.iloc[25, col]
 
-        for col, terminal in zip(
-            range(2, 10),
-            [
-                "TOTAL",
-                "BARCELONA",
-                "CARTAGENA",
-                "HUELVA",
-                "BBG",
-                "SAGUNTO",
-                "REGANOSA",
-                "MUSEL",
-            ]
-        ):
+        registro[f"{terminal}_Descargas_GNL"] = df.iloc[26, col]
 
-            registro[
-                f"{terminal}_{nombre_fila}_{unidad}"
-            ] = datos.iloc[fila, col]
+        registro[f"{terminal}_Regasificacion_GWh"] = df.iloc[27, col]
+        registro[f"{terminal}_Regasificacion_m3"] = df.iloc[28, col]
+
+        registro[f"{terminal}_Carga_Cisternas"] = df.iloc[29, col]
+
+        registro[f"{terminal}_Exist_Final_GWh"] = df.iloc[30, col]
+        registro[f"{terminal}_Exist_Final_m3"] = df.iloc[31, col]
+
+        registro[f"{terminal}_Pct_Llenado"] = df.iloc[32, col]
 
     return registro
-
 
 def guardar_historico(df):
 
